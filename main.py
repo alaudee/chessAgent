@@ -23,18 +23,17 @@ from funcoes import *
 #     print(board)
 
 board = chess.Board()
-n = 0
 print(board)
-while n < 100:
-    if n%2 == 0:
+while not board.is_checkmate():
+    if board.turn:
         print(list(board.legal_moves))
         move = input("Coloque sua jogada: ")
         move = chess.Move.from_uci(str(move))
         board.push(move)
     else:
         print("Jogada da IA:")
-        move = minimaxRoot(2,board,True)
+        move = minimaxRoot(4,board,True)
         move = chess.Move.from_uci(str(move))
         board.push(move)
+    #clearConsole()
     print(board)
-    n += 1

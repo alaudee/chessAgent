@@ -13,18 +13,82 @@ def clearConsole():
 #     move = random.choice(list(moves))
 #     b.push(move)
 
-def evaluateBoard(board):
-  i = 0
-  evaluation = 0
-  x = True
-  try:
-    x = bool(board.piece_at(i).color)
-  except AttributeError as e:
-    x = x
-  while i < 63:
-      i += 1
-      evaluation += (getPieceValue(str(board.piece_at(i))) if x else -getPieceValue(str(board.piece_at(i))))
-  return evaluation
+def minimaxRoot(depth, board,isMaximizing):
+    possibleMoves = board.legal_moves
+    bestMove = -9999
+    bestMoveFinal = None
+    for x in possibleMoves:
+        move = chess.Move.from_uci(str(x))
+        board.push(move)
+        value = max(bestMove, minimax(depth - 1, board,-10000,10000, not isMaximizing))
+        board.pop()
+        if( value > bestMove):
+            print("Best score: " ,str(bestMove))
+            print("Best move: ",str(bestMoveFinal))
+            bestMove = value
+            bestMoveFinal = move
+    return bestMoveFinal
+
+def minimax(depth, board, alpha, beta, is_maximizing):
+    if(depth == 0):
+        return -evaluation(board)
+    possibleMoves = board.legal_moves
+    if(is_maximizing):
+        bestMove = -9999
+        for x in possibleMoves:
+            move = chess.Move.from_uci(str(x))
+            board.push(move)
+            bestMove = max(bestMove,minimax(depth - 1, board,alpha,beta, not is_maximizing))
+            board.pop()
+            alpha = max(alpha,bestMove)
+            if beta <= alpha:
+                return bestMove
+        return bestMove
+    else:
+        bestMove = 9999
+        for x in possibleMoves:
+            move = chess.Move.from_uci(str(x))
+            board.push(move)
+            bestMove = min(bestMove, minimax(depth - 1, board,alpha,beta, not is_maximizing))
+            board.pop()
+            beta = min(beta,bestMove)
+            if(beta <= alpha):
+                return bestMove
+        return bestMove
+
+
+def calculateMove(board):
+    possible_moves = board.legal_moves
+    if(len(possible_moves) == 0):
+        print("No more possible moves...Game Over")
+        sys.exit()
+    bestMove = None
+    bestValue = -9999
+    n = 0
+    for x in possible_moves:
+        move = chess.Move.from_uci(str(x))
+        board.push(move)
+        boardValue = -evaluation(board)
+        board.pop()
+        if(boardValue > bestValue):
+            bestValue = boardValue
+            bestMove = move
+
+    return bestMove
+
+def evaluation(board):
+    i = 0
+    evaluation = 0
+    x = True
+    try:
+        x = bool(board.piece_at(i).color)
+    except AttributeError as e:
+        x = x
+    while i < 63:
+        i += 1
+        evaluation = evaluation + (getPieceValue(str(board.piece_at(i))) if x else -getPieceValue(str(board.piece_at(i))))
+    return evaluation
+
 
 def getPieceValue(piece):
     if(piece == None):
@@ -44,45 +108,3 @@ def getPieceValue(piece):
         value = 900
     #value = value if (board.piece_at(place)).color else -value
     return value
-
-def minimaxRoot(depth, board,isMaximizing):
-    possibleMoves = board.legal_moves
-    bestMove = -9999
-    secondBest = -9999
-    thirdBest = -9999
-    bestMoveFinal = None
-    for x in possibleMoves:
-        move = chess.Move.from_uci(str(x))
-        board.push(move)
-        value = max(bestMove, minimax(depth - 1, board, not isMaximizing))
-        board.pop()
-        if( value > bestMove):
-            print("Best score: " ,str(bestMove))
-            print("Best move: ",str(bestMoveFinal))
-            print("Second best: ", str(secondBest))
-            thirdBest = secondBest
-            secondBest = bestMove
-            bestMove = value
-            bestMoveFinal = move
-    return bestMoveFinal
-
-def minimax(depth, board, is_maximizing):
-    if(depth == 0):
-        return -evaluateBoard(board)
-    possibleMoves = board.legal_moves
-    if(is_maximizing):
-        bestMove = -9999
-        for x in possibleMoves:
-            move = chess.Move.from_uci(str(x))
-            board.push(move)
-            bestMove = max(bestMove,minimax(depth - 1, board, not is_maximizing))
-            board.pop()
-        return bestMove
-    else:
-        bestMove = 9999
-        for x in possibleMoves:
-            move = chess.Move.from_uci(str(x))
-            board.push(move)
-            bestMove = min(bestMove, minimax(depth - 1, board, not is_maximizing))
-            board.pop()
-        return bestMove
