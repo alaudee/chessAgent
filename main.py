@@ -1,11 +1,10 @@
 from funcoes import *
 
 board = chess.Board()
+print("Bem vindo ao Xadrez!")
 playerColor = bool(int(input("Escolha a cor: Branco(1) ou preto(0)? ")))
-print(playerColor)
-
 print(board)
-while not board.is_checkmate() or not board.is_stalemate() or not board.is_insufficient_material():
+while not board.is_checkmate() or not board.is_stalemate() or not board.is_i90nsufficient_material():
     if board.turn == playerColor:
         print(list(board.legal_moves))
         move = chess.Move.from_uci(input("Coloque sua jogada: "))
@@ -17,4 +16,4 @@ while not board.is_checkmate() or not board.is_stalemate() or not board.is_insuf
         board.push(move)
     clearConsole()
     print(board)
-print("CABO O JOGO")
+print("Check Mate de ",board.turn)

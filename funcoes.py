@@ -2,7 +2,7 @@ from cgi import print_form
 import chess
 import os
 
-pawntablew = [
+pawnTablew = [
     0, 0, 0, 0, 0, 0, 0, 0,
     5, 10, 10, -20, -20, 10, 10, 5,
     5, -5, -10, 0, 0, -10, -5, 5,
@@ -12,9 +12,9 @@ pawntablew = [
     50, 50, 50, 50, 50, 50, 50, 50,
     0, 0, 0, 0, 0, 0, 0, 0]
 
-pawntableb = pawntablew[::-1]
+pawnTableb = pawnTablew[::-1]
 
-knightstablew = [
+knightsTablew = [
     -50, -40, -30, -30, -30, -30, -40, -50,
     -40, -20, 0, 5, 5, 0, -20, -40,
     -30, 5, 10, 15, 15, 10, 5, -30,
@@ -24,9 +24,9 @@ knightstablew = [
     -40, -20, 0, 0, 0, 0, -20, -40,
     -50, -40, -30, -30, -30, -30, -40, -50]
 
-knightstableb = knightstablew[::-1]
+knightsTableb = knightsTablew[::-1]
 
-bishopstablew = [
+bishopsTablew = [
     -20, -10, -10, -10, -10, -10, -10, -20,
     -10, 5, 0, 0, 0, 0, 5, -10,
     -10, 10, 10, 10, 10, 10, 10, -10,
@@ -36,9 +36,9 @@ bishopstablew = [
     -10, 0, 0, 0, 0, 0, 0, -10,
     -20, -10, -10, -10, -10, -10, -10, -20]
 
-bishopstableb = bishopstablew[::-1]
+bishopsTableb = bishopsTablew[::-1]
 
-rookstablew = [
+rooksTablew = [
     0, 0, 0, 5, 5, 0, 0, 0,
     -5, 0, 0, 0, 0, 0, 0, -5,
     -5, 0, 0, 0, 0, 0, 0, -5,
@@ -48,9 +48,9 @@ rookstablew = [
     5, 10, 10, 10, 10, 10, 10, 5,
     0, 0, 0, 0, 0, 0, 0, 0]
 
-rookstableb = rookstablew[::-1]
+rooksTableb = rooksTablew[::-1]
 
-queenstablew = [
+queensTablew = [
     -20, -10, -10, -5, -5, -10, -10, -20,
     -10, 0, 0, 0, 0, 0, 0, -10,
     -10, 5, 5, 5, 5, 5, 0, -10,
@@ -60,9 +60,9 @@ queenstablew = [
     -10, 0, 0, 0, 0, 0, 0, -10,
     -20, -10, -10, -5, -5, -10, -10, -20]
 
-queenstableb = queenstablew[::-1]
+queensTableb = queensTablew[::-1]
 
-kingstablew = [
+kingsTablew = [
     20, 30, 10, 0, 0, 10, 30, 20,
     20, 20, 0, 0, 0, 0, 20, 20,
     -10, -20, -20, -20, -20, -20, -20, -10,
@@ -72,7 +72,7 @@ kingstablew = [
     -30, -40, -40, -50, -50, -40, -40, -30,
     -30, -40, -40, -50, -50, -40, -40, -30]
 
-kingstableb = kingstablew[::-1]
+kingsTableb = kingsTablew[::-1]
 
 
 def clearConsole():
@@ -83,31 +83,29 @@ def clearConsole():
 
 
 def minimaxRoot(depth,board,isMaximizing):
-    possibleMoves = board.legal_moves
+    legalMoves = board.legal_moves
     bestMove = -9999
-    bestMoveFinal = None
-    for x in possibleMoves:
+    finalMove = None
+    for x in legalMoves:
         move = chess.Move.from_uci(str(x))
         board.push(move)
         value = max(bestMove, minimax(depth - 1, board,-10000,10000, not isMaximizing))
         board.pop()
         if value > bestMove:
-            print("Best score: " ,str(bestMove))
-            print("Best move: ",str(bestMoveFinal))
             bestMove = value
-            bestMoveFinal = move
-    return bestMoveFinal
+            finalMove = move
+    return finalMove
 
-def minimax(depth, board, alpha, beta, is_maximizing):
+def minimax(depth, board, alpha, beta, maximizing):
     if(depth == 0):
-        return -evaluation(board)
-    possibleMoves = board.legal_moves
-    if(is_maximizing):
+        return -evaluateBoard(board)
+    legalMoves = board.legal_moves
+    if(maximizing):
         bestMove = -9999
-        for x in possibleMoves:
+        for x in legalMoves:
             move = chess.Move.from_uci(str(x))
             board.push(move)
-            bestMove = max(bestMove,minimax(depth - 1, board,alpha,beta, not is_maximizing))
+            bestMove = max(bestMove,minimax(depth - 1, board,alpha,beta, not maximizing))
             board.pop()
             alpha = max(alpha,bestMove)
             if beta <= alpha:
@@ -115,24 +113,20 @@ def minimax(depth, board, alpha, beta, is_maximizing):
         return bestMove
     else:
         bestMove = 9999
-        for x in possibleMoves:
+        for x in legalMoves:
             move = chess.Move.from_uci(str(x))
             board.push(move)
-            bestMove = min(bestMove, minimax(depth - 1, board,alpha,beta, not is_maximizing))
+            bestMove = min(bestMove, minimax(depth - 1, board,alpha,beta, not maximizing))
             board.pop()
             beta = min(beta,bestMove)
             if beta <= alpha:
                 return bestMove
         return bestMove
 
-def evaluation(board):
+def evaluateBoard(board):
     i = 0
     evaluation = 0
-    x = True
-    try:
-        x = bool(board.piece_at(i).color)
-    except AttributeError as e:
-        x = x
+    x = board.turn
     while i < 63:
         i += 1
         evaluation = evaluation + (getPieceValue(str(board.piece_at(i)),i) if x else -getPieceValue(str(board.piece_at(i)),i))
@@ -144,15 +138,15 @@ def getPieceValue(piece,i):
         return 0
     value = 0
     if piece == "P" or piece == "p":
-        value = 10 + ((pawntablew[i]) if piece == "P" else (pawntableb[i]))
+        value = 10 + ((pawnTablew[i]) if piece == "P" else (pawnTableb[i]))
     if piece == "N" or piece == "n":
-        value = 30 + ((knightstablew[i]) if piece == "N" else (knightstablew[i]))
+        value = 30 + ((knightsTablew[i]) if piece == "N" else (knightsTableb[i]))
     if piece == "B" or piece == "b":
-        value = 30 + ((bishopstablew[i]) if piece == "B" else (bishopstableb[i]))
+        value = 30 + ((bishopsTablew[i]) if piece == "B" else (bishopsTableb[i]))
     if piece == "R" or piece == "r":
-        value = 50 + ((rookstablew[i]) if piece == "R" else (rookstableb[i]))
+        value = 50 + ((rooksTablew[i]) if piece == "R" else (rooksTableb[i]))
     if piece == "Q" or piece == "q":
-        value = 90 + ((queenstablew[i]) if piece == "Q" else (queenstableb[i]))
+        value = 90 + ((queensTablew[i]) if piece == "Q" else (queensTableb[i]))
     if piece == 'K' or piece == 'k':
-        value = 900 + ((kingstablew[i]) if piece == "K" else (kingstableb[i]))
+        value = 900 + ((kingsTablew[i]) if piece == "K" else (kingsTableb[i]))
     return value
