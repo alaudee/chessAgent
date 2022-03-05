@@ -1,3 +1,4 @@
+from calendar import c
 from cgi import print_form
 import chess
 import os
@@ -74,6 +75,14 @@ kingsTablew = [
 
 kingsTableb = kingsTablew[::-1]
 
+italianGamew = ("e4","Nf3","Bc4")
+italianGameb = ("e5","Nc6","Bb4")
+
+def italianGame(board,count):
+    if board.turn == True:
+        board.push_san(italianGamew[count])
+    else:
+        board.push_san(italianGameb[count])
 
 def clearConsole():
     command = 'clear'
@@ -150,3 +159,10 @@ def getPieceValue(piece,i):
     if piece == 'K' or piece == 'k':
         value = 900 + ((kingsTablew[i]) if piece == "K" else (kingsTableb[i]))
     return value
+
+def verifyPlayerMove(move,board):
+    try:
+        board.push_san(move)
+    except:
+        print("Jogada inválida, tente novamente")
+
