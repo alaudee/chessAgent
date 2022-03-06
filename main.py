@@ -7,7 +7,7 @@ board = chess.Board()
 print("Bem vindo ao Xadrez!")
 playerColor = bool(int(input("Escolha a cor: Branco(1) ou preto(0)? ")))
 print(board)
-while not board.is_checkmate() or not board.is_stalemate() or not board.is_i90nsufficient_material() or not board.is_game_over():
+while not gameOver(board):
     if board.turn == playerColor:
         print(board.legal_moves)
         move = input("Coloque sua jogada: ")
@@ -25,4 +25,4 @@ while not board.is_checkmate() or not board.is_stalemate() or not board.is_i90ns
             board.push(move)
         clearConsole()
         print(board)
-print("Check Mate de ",board.turn)
+print("Xeque mate")

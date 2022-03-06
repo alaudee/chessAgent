@@ -1,5 +1,3 @@
-from calendar import c
-from cgi import print_form
 import chess
 import os
 
@@ -166,3 +164,9 @@ def verifyPlayerMove(move,board):
     except:
         print("Jogada inválida, tente novamente")
 
+def gameOver(board):
+    if board.is_checkmate() or board.is_stalemate() or board.is_insufficient_material():
+        if(len(list(board.legal_moves)) == 0):
+            return True
+    else:
+        return False
